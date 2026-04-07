@@ -18,6 +18,10 @@ patchedDependencies:
 importers:
 
   .:
+    dependencies:
+      microsandbox:
+        specifier: ^0.3.12
+        version: 0.3.12
     devDependencies:
       turbo:
         specifier: ^2.5.5
@@ -163,8 +167,8 @@ importers:
         specifier: 0.1.77
         version: 0.1.77(solid-js@1.9.9)(stage-js@1.0.1)(typescript@5.9.3)(web-tree-sitter@0.25.10)
       microsandbox:
-        specifier: ^0.3.7
-        version: 0.3.9
+        specifier: ^0.3.12
+        version: 0.3.12
       opencode-router:
         specifier: 0.11.198
         version: link:../opencode-router
@@ -4526,24 +4530,24 @@ packages:
     resolution: {integrity: sha512-l2aFy5jALhniG5HgqrD6jXLi/rUWrKvqN/qJx6yoJsgKhblVd+iqqU4RCXavm/jPityDo5TCvKMnpjKnOriy0w==}
     dev: false
 
-  /@superradcompany/microsandbox-darwin-arm64@0.3.9:
-    resolution: {integrity: sha512-fmndqvs7X47DeBbwcBB6C/pKTJPgH3CWos4+fXnG3LyXZbvVUbAvWXHStbjfr5Og4QcrQEvI10GpXrPny0NvLw==}
+  /@superradcompany/microsandbox-darwin-arm64@0.3.12:
+    resolution: {integrity: sha512-RSOhkzmfXHTvm8+R2qcRihTGv5kRSL164rfs4q3gAigHFtTfYAUI2c+R6oX01b0V6/HBfvdrJKzihRpkrxQIWA==}
     engines: {node: '>= 18'}
     cpu: [arm64]
     os: [darwin]
     dev: false
     optional: true
 
-  /@superradcompany/microsandbox-linux-arm64-gnu@0.3.9:
-    resolution: {integrity: sha512-68mWJWaZWpkSakqVKpgCJsSecK3Fimf3Luckv9cU6WktYXw9MMtMx4xF51ES0NSk4VfaGcygSPK+fW4wtjBCoQ==}
+  /@superradcompany/microsandbox-linux-arm64-gnu@0.3.12:
+    resolution: {integrity: sha512-i5EiP8ZrNgOjNghBsvRqk5bZNKyaMFIGd/AvN/7tDKDYcffMdj/lAtQlwjIxHojlyeBzK3qor4idUG+GCVqyHA==}
     engines: {node: '>= 18'}
     cpu: [arm64]
     os: [linux]
     dev: false
     optional: true
 
-  /@superradcompany/microsandbox-linux-x64-gnu@0.3.9:
-    resolution: {integrity: sha512-961w/1f5PmisIIT2KzEV0xbpmcW0R4ENIw3MshPng909GSzgBgBN2AgNFC50/KFaeXa8LDXZpKbx0M2xAn+dHQ==}
+  /@superradcompany/microsandbox-linux-x64-gnu@0.3.12:
+    resolution: {integrity: sha512-v34c42HhltWI/jNp9ciDO3y+fqIh7KLg4XZ4o+X/h2aL+1n7dEHwx/LGBDuLsRxq6pt78pdZrMT54AdazK6A0g==}
     engines: {node: '>= 18'}
     cpu: [x64]
     os: [linux]
@@ -7015,13 +7019,13 @@ packages:
       braces: 3.0.3
       picomatch: 2.3.2
 
-  /microsandbox@0.3.9:
-    resolution: {integrity: sha512-z0vxPAX3PEyNRhKKx83f/tPHqVcJN5KobX4Hn4ncwUSo3dlN/ZJiaDylIOZdoRAYXJH+fX//RXp3kNcd+fVY4Q==}
+  /microsandbox@0.3.12:
+    resolution: {integrity: sha512-XnP7HzDXNB+0WQnLT1/O3G/DcNxhs1JHJPPRx+Kzcwfee9jsoziGCM/jJ+pItZeybl9mIm6AzVLpYQR285We0g==}
     engines: {node: '>= 18'}
     optionalDependencies:
-      '@superradcompany/microsandbox-darwin-arm64': 0.3.9
-      '@superradcompany/microsandbox-linux-arm64-gnu': 0.3.9
-      '@superradcompany/microsandbox-linux-x64-gnu': 0.3.9
+      '@superradcompany/microsandbox-darwin-arm64': 0.3.12
+      '@superradcompany/microsandbox-linux-arm64-gnu': 0.3.12
+      '@superradcompany/microsandbox-linux-x64-gnu': 0.3.12
     dev: false
 
   /mime-db@1.52.0:
