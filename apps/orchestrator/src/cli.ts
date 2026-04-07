@@ -43,12 +43,7 @@ import type { TuiHandle } from "./tui/app.js";
 
 type ApprovalMode = "manual" | "auto";
 
-type SandboxMode =
-  | "none"
-  | "auto"
-  | "docker"
-  | "container"
-  | "microsandbox";
+type SandboxMode = "none" | "auto" | "docker" | "container" | "microsandbox";
 
 type ResolvedSandboxMode = "none" | "docker" | "container" | "microsandbox";
 
@@ -991,7 +986,13 @@ async function readPinnedOpencodeVersion(): Promise<string | undefined> {
   const candidates = [
     join(dirname(process.execPath), "..", "constants.json"),
     join(dirname(fileURLToPath(import.meta.url)), "..", "constants.json"),
-    join(dirname(fileURLToPath(import.meta.url)), "..", "..", "..", "constants.json"),
+    join(
+      dirname(fileURLToPath(import.meta.url)),
+      "..",
+      "..",
+      "..",
+      "constants.json",
+    ),
   ];
 
   for (const candidate of candidates) {
@@ -1259,7 +1260,9 @@ function isLoopbackHost(host: string): boolean {
 }
 
 function randomCredential(length: number): string {
-  return randomBytes(Math.ceil(length / 2)).toString("hex").slice(0, length);
+  return randomBytes(Math.ceil(length / 2))
+    .toString("hex")
+    .slice(0, length);
 }
 
 function generateManagedOpencodeCredentials(): {
@@ -1281,13 +1284,13 @@ function resolveManagedOpencodeCredentials(args: ParsedArgs): {
   const requestedUsername =
     typeof explicitUsernameFlag === "string"
       ? explicitUsernameFlag
-      : process.env.OPENWORK_OPENCODE_USERNAME ??
-        process.env.OPENCODE_SERVER_USERNAME;
+      : (process.env.OPENWORK_OPENCODE_USERNAME ??
+        process.env.OPENCODE_SERVER_USERNAME);
   const requestedPassword =
     typeof explicitPasswordFlag === "string"
       ? explicitPasswordFlag
-      : process.env.OPENWORK_OPENCODE_PASSWORD ??
-        process.env.OPENCODE_SERVER_PASSWORD;
+      : (process.env.OPENWORK_OPENCODE_PASSWORD ??
+        process.env.OPENCODE_SERVER_PASSWORD);
   const allowInjectedCredentials =
     (process.env[INTERNAL_OPENCODE_CREDENTIALS_ENV] ?? "").trim() === "1";
   const hasExplicitCredentialFlags =
@@ -1416,7 +1419,9 @@ function resolveWorkerActivityHeartbeatConfig(): WorkerActivityHeartbeatConfig {
   const enabled = (process.env.DEN_ACTIVITY_HEARTBEAT_ENABLED ?? "")
     .trim()
     .toLowerCase();
-  const provider = (process.env.DEN_RUNTIME_PROVIDER ?? "").trim().toLowerCase();
+  const provider = (process.env.DEN_RUNTIME_PROVIDER ?? "")
+    .trim()
+    .toLowerCase();
   const workerId = (process.env.DEN_WORKER_ID ?? "").trim();
   const url = (process.env.DEN_ACTIVITY_HEARTBEAT_URL ?? "").trim();
   const token = (process.env.DEN_ACTIVITY_HEARTBEAT_TOKEN ?? "").trim();
@@ -1424,7 +1429,13 @@ function resolveWorkerActivityHeartbeatConfig(): WorkerActivityHeartbeatConfig {
   const featureEnabled =
     enabled === "1" || enabled === "true" || enabled === "yes";
 
-  if (!featureEnabled || provider !== "daytona" || !workerId || !url || !token) {
+  if (
+    !featureEnabled ||
+    provider !== "daytona" ||
+    !workerId ||
+    !url ||
+    !token
+  ) {
     return {
       enabled: false,
       workerId: "",
@@ -1461,7 +1472,9 @@ async function postWorkerActivityHeartbeat(input: {
 }) {
   if (!input.config.enabled) return;
 
-  const sessions = unwrap(await input.opencodeClient.session.list({ limit: 200 }));
+  const sessions = unwrap(
+    await input.opencodeClient.session.list({ limit: 200 }),
+  );
   let latestActivityAt = 0;
   for (const session of sessions) {
     const ts = parseSessionActivityAt(session);
@@ -1472,7 +1485,8 @@ async function postWorkerActivityHeartbeat(input: {
 
   const now = Date.now();
   const isActiveRecently =
-    latestActivityAt > 0 && now - latestActivityAt <= input.config.activeWindowMs;
+    latestActivityAt > 0 &&
+    now - latestActivityAt <= input.config.activeWindowMs;
 
   const payload = {
     sentAt: new Date(now).toISOString(),
@@ -1610,7 +1624,10 @@ function isDirectory(path: string): boolean {
 
 function splitPathEntries(value?: string): string[] {
   if (!value) return [];
-  return value.split(delimiter).map((entry) => entry.trim()).filter(Boolean);
+  return value
+    .split(delimiter)
+    .map((entry) => entry.trim())
+    .filter(Boolean);
 }
 
 function pushPath(entries: string[], path?: string | null) {
@@ -1718,7 +1735,9 @@ function buildSpawnEnv(env?: NodeJS.ProcessEnv): NodeJS.ProcessEnv {
     ...resolveExtraPathEntries(),
     ...splitPathEntries(currentPath),
   ];
-  const deduped = entries.filter((entry, index) => entries.indexOf(entry) === index);
+  const deduped = entries.filter(
+    (entry, index) => entries.indexOf(entry) === index,
+  );
   if (!deduped.length) return { ...base };
   return { ...base, [pathKey]: deduped.join(delimiter) };
 }
@@ -2821,7 +2840,9 @@ function readMessagingEnabledFromOpenworkConfig(
   return readOptionalBool(messaging.enabled);
 }
 
-function hasConfiguredMessagingServices(routerConfig: Record<string, unknown>): boolean {
+function hasConfiguredMessagingServices(
+  routerConfig: Record<string, unknown>,
+): boolean {
   const channels = asRecord(routerConfig.channels);
 
   const telegram = asRecord(channels.telegram);
@@ -2832,9 +2853,7 @@ function hasConfiguredMessagingServices(routerConfig: Record<string, unknown>): 
   if (
     telegramBots.some((bot) => {
       const record = asRecord(bot);
-      return (
-        typeof record.token === "string" && record.token.trim().length > 0
-      );
+      return typeof record.token === "string" && record.token.trim().length > 0;
     })
   ) {
     return true;
@@ -2877,9 +2896,7 @@ async function resolveOpencodeRouterEnabled(
     return { enabled: parsedFlag, source: "flag" };
   }
 
-  const envValue = readOptionalBool(
-    process.env.OPENWORK_OPENCODE_ROUTER,
-  );
+  const envValue = readOptionalBool(process.env.OPENWORK_OPENCODE_ROUTER);
   if (envValue !== undefined) {
     return { enabled: envValue, source: "env" };
   }
@@ -4255,7 +4272,9 @@ async function writeSandboxEntrypoint(options: {
     ? `export OPENCODE_ROUTER_HEALTH_PORT=${shQuote(String(SANDBOX_INTERNAL_OPENCODE_ROUTER_HEALTH_PORT))}`
     : "";
   const openworkDevMode = (process.env.OPENWORK_DEV_MODE ?? "").trim() === "1";
-  const sandboxHomeDir = openworkDevMode ? "/persist/openwork-dev-data/home" : "/persist";
+  const sandboxHomeDir = openworkDevMode
+    ? "/persist/openwork-dev-data/home"
+    : "/persist";
 
   const script = [
     "set -eu",
@@ -4887,29 +4906,61 @@ async function startMicrosandboxSandbox(options: {
     ports,
   });
 
-  const sandbox = await Sandbox.createDetached({
-    name: options.containerName,
-    image: options.image,
-    replace: true,
-    volumes,
-    ports,
-  });
+  const sandbox = options.detach
+    ? await Sandbox.createDetached({
+        name: options.containerName,
+        image: options.image,
+        replace: true,
+        volumes,
+        ports,
+      })
+    : await Sandbox.create({
+        name: options.containerName,
+        image: options.image,
+        replace: true,
+        volumes,
+        ports,
+      });
 
   // Run the entrypoint script inside the sandbox.
   const scriptInContainer = `${staged.rootInContainer}/entrypoint.sh`;
-  const entrypointHandle = await sandbox.execStream("sh", [scriptInContainer]);
 
-  // Stream sandbox output to the logger.
-  (async () => {
-    let event;
-    while ((event = await entrypointHandle.recv()) !== null) {
-      if (event.eventType === "stdout" && event.data) {
-        options.logger.debug(event.data.toString("utf8").trimEnd(), {}, "sandbox");
-      } else if (event.eventType === "stderr" && event.data) {
-        options.logger.warn(event.data.toString("utf8").trimEnd(), {}, "sandbox");
+  // In detached mode, background the entrypoint with nohup so the process
+  // survives after the SDK client (orchestrator) disconnects.  execStream'd
+  // processes are killed when the client exits; nohup + & prevents that.
+  let entrypointHandle: Awaited<ReturnType<typeof sandbox.execStream>> | null =
+    null;
+
+  if (options.detach) {
+    await sandbox.exec("sh", [
+      "-c",
+      `nohup sh ${scriptInContainer} > /tmp/openwork-entrypoint.log 2>&1 &`,
+    ]);
+    // Release SDK handle ownership so the sandbox survives process exit.
+    await sandbox.detach();
+  } else {
+    entrypointHandle = await sandbox.execStream("sh", [scriptInContainer]);
+
+    // Stream sandbox output to the logger.
+    (async () => {
+      let event;
+      while ((event = await entrypointHandle!.recv()) !== null) {
+        if (event.eventType === "stdout" && event.data) {
+          options.logger.debug(
+            event.data.toString("utf8").trimEnd(),
+            {},
+            "sandbox",
+          );
+        } else if (event.eventType === "stderr" && event.data) {
+          options.logger.warn(
+            event.data.toString("utf8").trimEnd(),
+            {},
+            "sandbox",
+          );
+        }
       }
-    }
-  })().catch(() => {});
+    })().catch(() => {});
+  }
 
   // Create a shim ChildProcess-like EventEmitter so the caller's
   // .on("exit") / .on("error") / .pid patterns continue to work.
@@ -4925,11 +4976,13 @@ async function startMicrosandboxSandbox(options: {
     },
   }) as unknown as ReturnType<typeof spawn>;
 
-  // Monitor the entrypoint and emit "exit" when it finishes.
-  entrypointHandle
-    .wait()
-    .then((status) => childShim.emit("exit", status.code, null))
-    .catch((err) => childShim.emit("error", err));
+  if (entrypointHandle) {
+    // Attached mode: monitor the entrypoint and emit "exit" when it finishes.
+    entrypointHandle
+      .wait()
+      .then((status) => childShim.emit("exit", status.code, null))
+      .catch((err) => childShim.emit("error", err));
+  }
 
   const cleanup = async () => {
     await staged.cleanup();
@@ -5616,7 +5669,9 @@ function createLogger(options: {
       ...(attributes ?? {}),
     };
     const redactedMessage = redactSensitiveString(message);
-    const redactedAttributes = redactLogValue(mergedAttributes) as LogAttributes;
+    const redactedAttributes = redactLogValue(
+      mergedAttributes,
+    ) as LogAttributes;
     options.onLog?.({
       time: Date.now(),
       level,
@@ -7585,7 +7640,7 @@ async function runStart(args: ParsedArgs) {
         headers:
           opencodeUsername && opencodePassword
             ? {
-          Authorization: `Basic ${encodeBasicAuth(opencodeCredentials.username, opencodeCredentials.password)}`,
+                Authorization: `Basic ${encodeBasicAuth(opencodeCredentials.username, opencodeCredentials.password)}`,
               }
             : undefined,
       }),
@@ -7868,7 +7923,14 @@ async function runStart(args: ParsedArgs) {
       "Use `--json` only when you explicitly need the raw tokens or passwords in command output.",
     ].join("\n");
     process.stdout.write(`${summary}\n`);
-    process.exit(0);
+    // Do NOT call process.exit() for microsandbox — the NAPI-RS native binding
+    // stops the VM during process cleanup despite createDetached/detach.  Instead,
+    // keep the process alive and let the desktop app kill it when the sandbox stops.
+    if (sandboxMode !== "microsandbox") {
+      process.exit(0);
+    }
+    // For microsandbox: the process stays alive but idle; SIGTERM/SIGINT from the
+    // desktop app or OS will terminate it (signal handlers registered later).
   };
 
   if (useTui) {
@@ -8167,10 +8229,9 @@ async function runStart(args: ParsedArgs) {
         sandboxMode === "container"
           ? stopAppleContainer
           : sandboxMode === "microsandbox"
-            ? (name: string) =>
-                stopMicrosandbox(name)
-          : (name: string) =>
-              stopDockerContainer(name, dockerCommand ?? "docker");
+            ? (name: string) => stopMicrosandbox(name)
+            : (name: string) =>
+                stopDockerContainer(name, dockerCommand ?? "docker");
       sandboxStopCommand =
         sandboxMode === "container"
           ? "container stop"
@@ -8264,49 +8325,49 @@ async function runStart(args: ParsedArgs) {
                 detach: detachRequested,
                 logger,
               })
-          : await startDockerSandbox({
-              image: sandboxImage,
-              dockerCommand: dockerCommand ?? "docker",
-              containerName,
-              workspace: resolvedWorkspace,
-              persistDir: sandboxPersistDir,
-              opencodeConfigDir,
-              extraMounts: sandboxExtraMounts,
-              sidecars: {
-                opencode: opencodeBinary.bin,
-                openworkServer: openworkServerBinary.bin,
-                opencodeRouter: opencodeRouterEnabled
-                  ? (opencodeRouterBinary?.bin ?? null)
-                  : null,
-              },
-              ports: {
-                openwork: openworkPort,
-                // In sandbox mode, opencodeRouter is only reachable via openwork-server
-                // proxy (/opencode-router/*). Do not publish a separate host port.
-                opencodeRouterHealth: null,
-              },
-              opencode: {
-                corsOrigins: corsOrigins.length ? corsOrigins : ["*"],
-                username: opencodeUsername,
-                password: opencodePassword,
-                hotReload: opencodeHotReload,
-              },
-              openwork: {
-                token: openworkToken,
-                hostToken: openworkHostToken,
-                approvalMode: approvalMode === "auto" ? "auto" : "manual",
-                approvalTimeoutMs,
-                readOnly,
-                corsOrigins: corsOrigins.length ? corsOrigins : ["*"],
-                opencodeUsername,
-                opencodePassword,
+            : await startDockerSandbox({
+                image: sandboxImage,
+                dockerCommand: dockerCommand ?? "docker",
+                containerName,
+                workspace: resolvedWorkspace,
+                persistDir: sandboxPersistDir,
+                opencodeConfigDir,
+                extraMounts: sandboxExtraMounts,
+                sidecars: {
+                  opencode: opencodeBinary.bin,
+                  openworkServer: openworkServerBinary.bin,
+                  opencodeRouter: opencodeRouterEnabled
+                    ? (opencodeRouterBinary?.bin ?? null)
+                    : null,
+                },
+                ports: {
+                  openwork: openworkPort,
+                  // In sandbox mode, opencodeRouter is only reachable via openwork-server
+                  // proxy (/opencode-router/*). Do not publish a separate host port.
+                  opencodeRouterHealth: null,
+                },
+                opencode: {
+                  corsOrigins: corsOrigins.length ? corsOrigins : ["*"],
+                  username: opencodeUsername,
+                  password: opencodePassword,
+                  hotReload: opencodeHotReload,
+                },
+                openwork: {
+                  token: openworkToken,
+                  hostToken: openworkHostToken,
+                  approvalMode: approvalMode === "auto" ? "auto" : "manual",
+                  approvalTimeoutMs,
+                  readOnly,
+                  corsOrigins: corsOrigins.length ? corsOrigins : ["*"],
+                  opencodeUsername,
+                  opencodePassword,
+                  logFormat,
+                },
+                runId,
                 logFormat,
-              },
-              runId,
-              logFormat,
-              detach: detachRequested,
-              logger,
-            });
+                detach: detachRequested,
+                logger,
+              });
 
       sandboxCleanup = sandboxChild.cleanup;
       tui?.updateService("opencode", {
@@ -8842,7 +8903,9 @@ async function runStart(args: ParsedArgs) {
       console.log(`OpenCode: ${payload.opencode.baseUrl}`);
       console.log(`OpenCode connect URL: ${payload.opencode.connectUrl}`);
       if (payload.opencode.username && payload.opencode.password) {
-        console.log("OpenCode auth: managed credentials configured (withheld from stdout)");
+        console.log(
+          "OpenCode auth: managed credentials configured (withheld from stdout)",
+        );
       }
       console.log(`OpenWork server: ${payload.openwork.baseUrl}`);
       console.log(`OpenWork connect URL: ${payload.openwork.connectUrl}`);
